@@ -58,11 +58,11 @@ def compute_dsf(phonon, n_sample, r_max, r_bin_width, f_max, f_bin_width,
     print("primitive lattice:\n", prim_latt, "\n", flush=True)
 
     # generate uniform k-point mesh within sphere of r_max radius
-    #   convert to primitive reciprocal basis and assign to shells
+    # convert to primitive reciprocal basis and assign to shells
     shells = generate_qpoints(n_sample, r_max, r_bin_width, prim_latt)
 
-    # mesh sampling phonon calculation is needed for Debye-Waller factor.
-    # this must be done with is_mesh_symmetry=False and with_eigenvectors=True.
+    # mesh sampling phonon calculation is needed for Debye-Waller factor
+    # this must be done with is_mesh_symmetry=False and with_eigenvectors=True
     mesh = [11, 11, 11]
     phonon.run_mesh(mesh,
                     is_mesh_symmetry=False,
@@ -70,6 +70,7 @@ def compute_dsf(phonon, n_sample, r_max, r_bin_width, f_max, f_bin_width,
 
     n_freq = int(f_max/f_bin_width) # number of frequency bins
     # loop over shells
+    # doing reversely to early detect potential memory issues for outer shells
     for ishell in reversed(range(start_shell, int(r_max/r_bin_width))):
         shell_data = [ishell] + [0] * n_freq # initialize data
         # skip empty shells
@@ -79,12 +80,12 @@ def compute_dsf(phonon, n_sample, r_max, r_bin_width, f_max, f_bin_width,
             print("Empty shell ID:", ishell, flush=True)
             continue
         
-        # For INS, scattering length has to be given.
-        # The following values is obtained at (Coh b)
+        # for INS, scattering length has to be given.
+        # the following values is obtained at (Coh b)
         # https://www.nist.gov/ncnr/neutron-scattering-lengths-list
         
-        # Parallal calculation
-        n_worker = min(mp.cpu_count()//2, len(shells[ishell]))
+        # parallal calculation
+        n_worker = min(mp.cpu_count(), len(shells[ishell]))
         if n_worker <= 0: n_worker = 1 # quite unnecessary, but just in case
         print("Working on shell ID: {}, number of points: {}"
                  .format(ishell, len(shells[ishell])), flush=True)
