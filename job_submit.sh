@@ -20,5 +20,5 @@ cd ${PBS_O_WORKDIR}
 
 ## job specific
 
-aprun -n 32 /u/raymondw/miniconda2/envs/phonopy/bin/python DSF_copper.py > job.log 
+aprun -n 32 /u/raymondw/miniconda2/envs/phonopy/bin/python DSF_simulator.py > job.log 
 
